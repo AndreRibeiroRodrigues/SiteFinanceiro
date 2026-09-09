@@ -6,11 +6,14 @@ import java.util.UUID;
 import io.rayjir.finand.controller.dto.DespesaDTO;
 import io.rayjir.finand.controller.mappers.DespesaMapper;
 import io.rayjir.finand.repository.FinanceiroRepository;
+import io.rayjir.finand.service.DespesaService;
 import io.rayjir.finand.entity.Despesa;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,30 +30,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class DespesasController {
 
     private final FinanceiroRepository financeiroRepository;
+
+    private final DespesaService despesaservice;
     private final DespesaMapper mapper;
 
     @GetMapping("/get")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<Despesa>> getDespesas() {
-        return ResponseEntity.ok(financeiroRepository.findAll());
+    public ResponseEntity<List<Despesa>> getDespesas(Authentication authentication) {
+        UserDetails usuarioLogado = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(despesaservice.getDespesas(usuarioLogado.getUsername()));
     }
-    
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Despesa> getDespesa(@PathVariable("id") UUID id) {
-//        Despesa despesa = financeiroRepository.findById(id).orElse(null);
-//        if (despesa == null) {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//        return new ResponseEntity<>(despesa, HttpStatus.OK);
-//    }
 
     @PostMapping("/postDespesa")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Despesa> postDespesa(@RequestBody DespesaDTO dto) {
-        Despesa entity = mapper.toEnity(dto);
-        Despesa despesaSalva = financeiroRepository.save(entity);
-        return new ResponseEntity<>(despesaSalva, HttpStatus.CREATED);
-    }
+    @ResponseStatus(HttpStatus.CREATED)
+    public void postDespesa(
+        @RequestBody DespesaDTO dto, 
+        Authentication authentication) {
+        UserDetails usuarioLogado = (UserDetails) authentication.getPrincipal();
+        despesaservice.postDespesa(mapper.toEnity(dto), usuarioLogado.getUsername());
+        }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Despesa> putDespesa(

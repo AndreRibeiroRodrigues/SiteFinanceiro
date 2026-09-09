@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor
 public class UsuarioController {
-    
     private final UsuarioService service;
     private final UsuarioMapper mapper;
 

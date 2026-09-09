@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 @Service 
 @RequiredArgsConstructor 
 public class DespesaService {
-    
     private final FinanceiroRepository repository;
     private final UsuarioService service;
 

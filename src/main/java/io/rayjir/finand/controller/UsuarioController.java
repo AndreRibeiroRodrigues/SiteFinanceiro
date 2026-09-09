@@ -1,5 +1,6 @@
 package io.rayjir.finand.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,9 +25,9 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void PostUsuario(@RequestBody UsuarioDTO dto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public void postUsuario(@RequestBody UsuarioDTO dto) {
         var usuario = mapper.toEntity(dto);
         service.salvar(usuario);
     }
-    
 }

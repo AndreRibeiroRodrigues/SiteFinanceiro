@@ -14,7 +14,7 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final PasswordEncoder encoder;
 
-    public void salvar(Usuario usuario){
+    public void salvar(Usuario usuario) {
         usuario.setPassword(encoder.encode(usuario.getPassword()));
         repository.save(usuario);
     }

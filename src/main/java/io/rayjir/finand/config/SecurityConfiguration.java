@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,12 +21,14 @@ import io.rayjir.finand.service.UsuarioService;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfiguration {
     
     @Bean
     public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
                 .formLogin(configurer ->{
                     configurer.loginPage("/login")
                             .failureUrl("/login?error")
@@ -35,7 +38,6 @@ public class SecurityConfiguration {
                 .logout(configurer -> configurer
                         .logoutSuccessUrl("/login?logout")
                         .permitAll())
-                .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize ->{
                     authorize.requestMatchers(
                             "/login",
@@ -43,8 +45,8 @@ public class SecurityConfiguration {
                             "/js/**",
                             "/images/**"
                     ).permitAll();
-                    authorize.requestMatchers(HttpMethod.POST,"/usuarios/**").hasRole("ADMIN");
-                    authorize.requestMatchers(HttpMethod.GET, "/api/despesas").hasRole("USER");
+                   // authorize.requestMatchers(HttpMethod.POST,"/api/usuarios/**").hasRole("ADMIN");
+                   // authorize.requestMatchers(HttpMethod.GET, "/api/despesas").hasAnyRole("USER", "ADMIN");
                     authorize.anyRequest().authenticated();
                 })
                 .build();

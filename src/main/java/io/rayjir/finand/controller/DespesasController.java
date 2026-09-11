@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -43,13 +42,13 @@ public class DespesasController {
 
     @PostMapping("/postDespesa")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void postDespesa(
-        @RequestBody DespesaDTO dto, 
+    public ResponseEntity<Despesa> postDespesa(
+        @RequestBody DespesaDTO dto,
         Authentication authentication) {
         UserDetails usuarioLogado = (UserDetails) authentication.getPrincipal();
-        despesaservice.postDespesa(mapper.toEnity(dto), usuarioLogado.getUsername());
-        }
+        Despesa salva = despesaservice.postDespesa(mapper.toEnity(dto), usuarioLogado.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(salva);
+    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")

@@ -15,10 +15,10 @@ public class DespesaService {
     private final FinanceiroRepository repository;
     private final UsuarioService service;
 
-    public void postDespesa(Despesa despesa, String username){
+    public Despesa postDespesa(Despesa despesa, String username){
         Usuario user = service.getUsuario(username);
-        despesa.setUsuarioId(user.getId());
-        repository.save(despesa);
+        despesa.setUsuario(user);
+        return repository.save(despesa);
     }
 
     public List<Despesa> getDespesas(String username){

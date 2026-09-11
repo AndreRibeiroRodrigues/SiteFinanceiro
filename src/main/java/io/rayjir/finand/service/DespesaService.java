@@ -1,6 +1,8 @@
 package io.rayjir.finand.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -15,14 +17,21 @@ public class DespesaService {
     private final FinanceiroRepository repository;
     private final UsuarioService service;
 
-    public Despesa postDespesa(Despesa despesa, String username){
-        Usuario user = service.getUsuario(username);
-        despesa.setUsuario(user);
+    public Despesa postDespesa(Despesa despesa, Usuario usuario){
+        
+        despesa.setUsuario(usuario);
         return repository.save(despesa);
     }
 
-    public List<Despesa> getDespesas(String username){
-        Usuario user = service.getUsuario(username);
+    public List<Despesa> getDespesas(Usuario user){
         return repository.findAllByUsuarioId(user.getId());
+    }
+
+    public Boolean deleteDespesa(UUID id, Usuario user){
+        Optional<Despesa> despesa = repository.findById(id);
+
+        if(despesa.get){}
+        
+
     }
 }

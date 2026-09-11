@@ -7,6 +7,7 @@ import io.rayjir.finand.controller.dto.DespesaDTO;
 import io.rayjir.finand.controller.mappers.DespesaMapper;
 import io.rayjir.finand.repository.FinanceiroRepository;
 import io.rayjir.finand.service.DespesaService;
+import io.rayjir.finand.service.SecurityService;
 import io.rayjir.finand.entity.Despesa;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,23 +31,24 @@ public class DespesasController {
 
     private final FinanceiroRepository financeiroRepository;
 
-    private final DespesaService despesaservice;
+    private final DespesaService despesaService;
     private final DespesaMapper mapper;
+    private final SecurityService securityService;
 
     @GetMapping("/get")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<List<Despesa>> getDespesas(Authentication authentication) {
-        UserDetails usuarioLogado = (UserDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(despesaservice.getDespesas(usuarioLogado.getUsername()));
+    public ResponseEntity<List<Despesa>> getDespesas() {
+        return ResponseEntity.ok(despesaService.getDespesas(securityService.getLogedUser()));
     }
 
     @PostMapping("/postDespesa")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Despesa> postDespesa(
-        @RequestBody DespesaDTO dto,
-        Authentication authentication) {
-        UserDetails usuarioLogado = (UserDetails) authentication.getPrincipal();
-        Despesa salva = despesaservice.postDespesa(mapper.toEnity(dto), usuarioLogado.getUsername());
+        @RequestBody DespesaDTO dto) {
+        Despesa salva = despesaService.postDespesa(
+            mapper.toEnity(dto), 
+            securityService.getLogedUser()
+    );
         return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
 
@@ -73,11 +75,12 @@ public class DespesasController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Void> deleteDespesa(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> deleteDespesa(@PathVariable("id") UUID id ) {
         if (!financeiroRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
+        }else{
+            despesaService.deleteDespesa(id, securityService.getLogedUser());
         }
-        financeiroRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -10,4 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface FinanceiroRepository extends JpaRepository<Despesa, UUID> {
 
     List<Despesa> findAllByUsuarioId(UUID id);
+
+    Despesa findById(UUID id);
 }

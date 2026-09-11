@@ -27,11 +27,12 @@ public class DespesaService {
         return repository.findAllByUsuarioId(user.getId());
     }
 
-    public Boolean deleteDespesa(UUID id, Usuario user){
-        Optional<Despesa> despesa = repository.findById(id);
-
-        if(despesa.get){}
+    public void deleteDespesa(UUID id, Usuario user){
+        Despesa despesa = repository.findById(id);
+        if(despesa.getUsuario().getId() == user.getId()){
+            repository.delete(id);
+        }
         
-
     }
+    
 }

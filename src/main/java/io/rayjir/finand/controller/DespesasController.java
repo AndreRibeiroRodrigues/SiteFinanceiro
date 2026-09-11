@@ -76,11 +76,15 @@ public class DespesasController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteDespesa(@PathVariable("id") UUID id ) {
-        if (!financeiroRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }else{
-            despesaService.deleteDespesa(id, securityService.getLogedUser());
+        try {
+            if (!financeiroRepository.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }else{
+                despesaService.deleteDespesa(id, securityService.getLogedUser());
+            }
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            // TODO: handle exception
         }
-        return ResponseEntity.noContent().build();
     }
 }

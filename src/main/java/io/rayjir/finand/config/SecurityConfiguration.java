@@ -1,5 +1,7 @@
 package io.rayjir.finand.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -11,6 +13,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import io.rayjir.finand.security.CustomUserDetailsService;
 import io.rayjir.finand.service.UsuarioService;
@@ -23,6 +28,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityfilterchain(HttpSecurity http) throws Exception{
         return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(configurer ->{
@@ -52,7 +58,7 @@ public class SecurityConfiguration {
     }
     
     @Bean
-    public UserDetailsService userDetailsService(UsuarioService usuarioservice){
+    public UserDetailsService userDetailsService(UsuarioService usuarioservice) {
         // UserDetails userD1 = User.builder()
         //                         .username("andre")
         //                         .password(encoder.encode("12345"))
@@ -67,5 +73,34 @@ public class SecurityConfiguration {
 
         // return new InMemoryUserDetailsManager(userD1, userD2);
         return new CustomUserDetailsService(usuarioservice);
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of(
+            "https://finand.playit.plus",
+            "http://localhost:8080"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of("*"));
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }

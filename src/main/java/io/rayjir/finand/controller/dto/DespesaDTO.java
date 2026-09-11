@@ -2,13 +2,14 @@ package io.rayjir.finand.controller.dto;
 
 import io.rayjir.finand.entity.FormaPagamento;
 import io.rayjir.finand.entity.Status;
+import io.rayjir.finand.entity.Usuario;
 
 import java.util.Date;
 import java.util.UUID;
 
 public record DespesaDTO(
     UUID id, 
-    UUID usuarioId, 
+    Usuario usuario, 
     Date date, 
     String category, 
     String subcategory, 
